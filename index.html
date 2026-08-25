@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maryam & Jijin — Wrapped</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #12081c;
+  --pink: #ff2e88;
+  --gold: #ffd166;
+  --violet: #7c3aed;
+  --cream: #f5e9ff;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--cream);
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  transition: opacity 0.4s ease;
+}
+
+.card.active { display: flex; }
+
+.eyebrow {
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.big-stat {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(56px, 16vw, 130px);
+  line-height: 0.95;
+  background: linear-gradient(135deg, var(--pink), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-size: 18px;
+  max-width: 340px;
+  line-height: 1.5;
+  color: var(--cream);
+  opacity: 0.9;
+}
+
+.sub {
+  margin-top: 24px;
+  font-size: 14px;
+  opacity: 0.55;
+}
+
+/* vinyl */
+.vinyl {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #000 0%, #000 8%, #1a1a1a 9%, #1a1a1a 30%, #000 31%, #000 100%);
+  border: 3px solid var(--pink);
+  margin-bottom: 28px;
+  animation: spin 4s linear infinite;
+  position: relative;
+}
+.vinyl::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 14px; height: 14px;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+@keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+/* progress dots */
+#progress {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+.dot {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.dot-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+}
+.dot.done .dot-fill { width: 100%; }
+
+/* nav zones */
+.nav-zone {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 30%;
+  z-index: 5;
+}
+.nav-zone.left { left: 0; }
+.nav-zone.right { right: 0; }
+
+/* songs list */
+.song-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  text-align: left;
+}
+.song-rank {
+  font-family: 'Anton', sans-serif;
+  font-size: 24px;
+  color: var(--gold);
+  width: 28px;
+}
+.song-info { flex: 1; }
+.song-title { font-weight: 700; font-size: 15px; }
+.song-artist { font-size: 12px; opacity: 0.6; }
+.bars { display: flex; gap: 2px; align-items: flex-end; height: 16px; }
+.song-row { cursor: pointer; transition: background 0.2s; }
+.song-row:hover { background: rgba(255,255,255,0.1); }
+.song-row.playing-row { background: rgba(255,46,136,0.15); }
+.bars span {
+  width: 3px;
+  background: var(--pink);
+  height: 4px;
+}
+.playing-row .bars span {
+  animation: bounce 0.8s ease-in-out infinite alternate;
+}
+.bars span:nth-child(2) { animation-delay: 0.2s; }
+.bars span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { from { height: 4px; } to { height: 16px; } }
+
+/* photo upload */
+.upload-box {
+  border: 2px dashed rgba(255,255,255,0.3);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.upload-box:hover { border-color: var(--pink); }
+#photoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 340px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+#photoGrid img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.tap-hint {
+  position: absolute;
+  bottom: 20px;
+  font-size: 12px;
+  opacity: 0.4;
+  letter-spacing: 1px;
+}
+
+.heart-burst {
+  position: absolute;
+  font-size: 20px;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <audio id="bgm" src="background.mp3" loop></audio>
+  <div id="progress"></div>
+
+  <div class="card active" data-card="0" style="background: radial-gradient(circle at 50% 30%, #2a0f3d, #12081c 70%);">
+    <div class="vinyl"></div>
+    <div class="eyebrow">Presenting</div>
+    <div style="font-family:'Anton',sans-serif; font-size:clamp(32px,9vw,56px); line-height:1.1;">MARYAM<br>&amp; JIJIN</div>
+    <div class="label" style="margin-top:16px;">Wrapped</div>
+    <div class="tap-hint">tap to begin →</div>
+  </div>
+
+  <div class="card" data-card="1" style="background: linear-gradient(160deg, #241040, #12081c);">
+    <div class="eyebrow">Before we ever met</div>
+    <div class="big-stat" style="font-size:clamp(36px,10vw,68px);">APRIL 2025</div>
+    <div class="label">The month we started talking — online, before anything else.</div>
+  </div>
+
+  <div class="card" data-card="2" style="background: linear-gradient(160deg, #3a0f2e, #12081c);">
+    <div class="eyebrow">Two months later</div>
+    <div class="big-stat" style="font-size:clamp(40px,11vw,80px);">JUNE 1<br><span style="font-size:0.4em;">2025</span></div>
+    <div class="label">She gave me her number.<br>The day we officially became <em>us</em> — before we'd even met.</div>
+  </div>
+
+  <div class="card" data-card="3" style="background: linear-gradient(160deg, #2e1a4a, #12081c);">
+    <div class="eyebrow">Almost a year later</div>
+    <div class="big-stat" style="font-size:clamp(40px,11vw,80px);">MAY 25<br><span style="font-size:0.4em;">2026</span></div>
+    <div class="label">The day we finally met in person.</div>
+  </div>
+
+  <div class="card" data-card="4" style="background: linear-gradient(160deg, #12081c, #3a0f2e);">
+    <div class="eyebrow">Since June 1</div>
+    <div class="big-stat" id="daysCount">0</div>
+    <div class="label">days together — and counting.</div>
+  </div>
+
+  <div class="card" data-card="5" style="background: linear-gradient(160deg, #1f0f3a, #12081c);">
+    <div class="eyebrow">Most called name</div>
+    <div class="big-stat">3,456</div>
+    <div class="label">times I've called her <strong>"Mari"</strong></div>
+  </div>
+
+  <div class="card" data-card="6" style="background: linear-gradient(160deg, #3a0f2e, #1f0f3a);">
+    <div class="eyebrow">Runner up</div>
+    <div class="big-stat" style="font-size:clamp(44px,13vw,100px);">2,789</div>
+    <div class="label">times I've called her <strong>"Maryumaaaa"</strong></div>
+  </div>
+
+  <div class="card" data-card="7" style="background: radial-gradient(circle at 50% 40%, #4a0f3a, #12081c 70%);">
+    <div class="big-stat" style="font-size:clamp(70px,20vw,150px);">∞</div>
+    <div class="label">and every other nickname after that —<br>I stopped counting.</div>
+  </div>
+
+  <div class="card" data-card="8" style="background: linear-gradient(160deg, #12081c, #2a0f3d);">
+    <div class="eyebrow">Our top tracks</div>
+    <div style="margin-top:8px; width:100%; display:flex; flex-direction:column; align-items:center;">
+      <div class="song-row" onclick="playSong(this, 'songs/1.mp3')">
+        <div class="song-rank">1</div>
+        <div class="song-info">
+          <div class="song-title">I Was Made for Lovin' You</div>
+          <div class="song-artist">KISS</div>
+        </div>
+        <div class="bars"><span></span><span></span><span></span></div>
+      </div>
+      <div class="song-row" onclick="playSong(this, 'songs/2.mp3')">
+        <div class="song-rank">2</div>
+        <div class="song-info">
+          <div class="song-title">I Wanna Be Your Slave</div>
+          <div class="song-artist">Måneskin</div>
+        </div>
+        <div class="bars"><span></span><span></span><span></span></div>
+      </div>
+      <div class="song-row" onclick="playSong(this, 'songs/3.mp3')">
+        <div class="song-rank">3</div>
+        <div class="song-info">
+          <div class="song-title">Duvet</div>
+          <div class="song-artist">Bôa</div>
+        </div>
+        <div class="bars"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-card="9" style="background: linear-gradient(160deg, #1f0f3a, #3a0f2e);">
+    <div class="eyebrow">The gallery</div>
+    <div class="label" style="margin-bottom:16px;">us, in pictures</div>
+    <div id="photoGrid">
+      <img src="photos/1.jpg" alt="">
+      <img src="photos/2.jpg" alt="">
+      <img src="photos/3.jpg" alt="">
+      <img src="photos/4.jpg" alt="">
+      <img src="photos/5.jpg" alt="">
+      <img src="photos/6.jpg" alt="">
+    </div>
+  </div>
+
+  <div class="card" data-card="10" style="background: radial-gradient(circle at 50% 30%, #ff2e88 -60%, #12081c 60%);">
+    <div class="vinyl"></div>
+    <div class="eyebrow">Every day since May 25</div>
+    <div style="font-family:'Anton',sans-serif; font-size:clamp(28px,8vw,48px); line-height:1.2;">I WAS MADE<br>FOR LOVIN' YOU</div>
+    <div class="label" style="margin-top:16px;">I love you Maryumaaaa forever ♾️</div>
+  </div>
+
+  <div class="nav-zone left" onclick="prevCard()"></div>
+  <div class="nav-zone right" onclick="nextCard()"></div>
+</div>
+
+<script>
+const totalCards = 11;
+let current = 0;
+
+function buildProgress() {
+  const wrap = document.getElementById('progress');
+  for (let i = 0; i < totalCards; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.innerHTML = '<div class="dot-fill"></div>';
+    wrap.appendChild(dot);
+  }
+}
+buildProgress();
+
+function updateProgress() {
+  const dots = document.querySelectorAll('.dot');
+  dots.forEach((d, i) => {
+    d.classList.toggle('done', i < current);
+    d.classList.toggle('active-fill', i === current);
+  });
+}
+
+function showCard(i) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.card[data-card="${i}"]`).classList.add('active');
+  updateProgress();
+}
+
+function nextCard() {
+  const bgm = document.getElementById('bgm');
+  if (bgm.paused) { bgm.volume = 0.5; bgm.play().catch(() => {}); }
+  if (current < totalCards - 1) {
+    current++;
+    showCard(current);
+  }
+}
+function prevCard() {
+  if (current > 0) {
+    current--;
+    showCard(current);
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'ArrowLeft') prevCard();
+});
+
+// live days counter
+function updateDays() {
+  const start = new Date('2025-06-01T00:00:00');
+  const now = new Date();
+  const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  document.getElementById('daysCount').textContent = diff.toLocaleString();
+}
+updateDays();
+
+// photos are static files — see photos/1.jpg through photos/6.jpg in the repo
+
+let songAudio = null;
+let activeRow = null;
+
+function playSong(rowEl, src) {
+  const bgm = document.getElementById('bgm');
+
+  // clicking the currently playing song pauses it
+  if (activeRow === rowEl && songAudio && !songAudio.paused) {
+    songAudio.pause();
+    rowEl.classList.remove('playing-row');
+    return;
+  }
+
+  if (songAudio) {
+    songAudio.pause();
+  }
+  if (activeRow) {
+    activeRow.classList.remove('playing-row');
+  }
+  if (!bgm.paused) {
+    bgm.pause();
+  }
+
+  songAudio = new Audio(src);
+  songAudio.volume = 0.8;
+  songAudio.play().catch(() => {});
+  rowEl.classList.add('playing-row');
+  activeRow = rowEl;
+
+  songAudio.onended = () => {
+    rowEl.classList.remove('playing-row');
+    activeRow = null;
+  };
+}
+</script>
+
+</body>
+</html>
